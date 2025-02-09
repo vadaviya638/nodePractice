@@ -1,0 +1,176 @@
+openapi: 3.0.0
+info:
+  title: User Management API
+  description: API for managing users with CRUD operations
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000/api/users
+    description: Local Development Server
+
+paths:
+  /:
+    get:
+      summary: Get all users
+      description: Fetch all users from the database
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /pagination:
+    get:
+      summary: Get paginated users
+      description: Fetch users with pagination, sorting, and search
+      parameters:
+        - name: page
+          in: query
+          description: Page number (default 1)
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Number of users per page (default 10)
+          required: false
+          schema:
+            type: integer
+        - name: sortBy
+          in: query
+          description: Field to sort by (default createdAt)
+          required: false
+          schema:
+            type: string
+        - name: order
+          in: query
+          description: Sort order (asc or desc, default desc)
+          required: false
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: Search users by name (case insensitive)
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  currentPage:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+
+  /{id}:
+    get:
+      summary: Get user by ID
+      description: Fetch a user by their unique ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+
+    put:
+      summary: Update a user
+      description: Update user details by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: Successfully updated
+        "404":
+          description: User not found
+
+    delete:
+      summary: Delete a user
+      description: Delete user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully deleted
+        "404":
+          description: User not found
+
+  /:
+    post:
+      summary: Create a new user
+      description: Create a new user with name, email, and phone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: User created successfully
+        "400":
+          description: Missing required fields
+        "409":
+          description: Email already exists
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "64a8b33c9c6b4a0023f9e8b2"
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          example: "john@example.com"
+        phone:
+          type: string
+          example: "+1234567890"
+        createdAt:
+          type: string
+          format: date-time

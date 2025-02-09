@@ -1,6 +1,8 @@
 
 const { configDotenv } = require("dotenv");
 const dbConnection = require("./connection");
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 const express = require("express");
 
@@ -21,9 +23,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/users", userRoutes);
 app.use("/auth", registerRoutes);
 
-
+const swaggerDocument = YAML.load('./swagger.yaml');
+// Serve Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.listen(process.env.PORT, () => {
-    console.log("Server is running on port 3000");
+    console.log(`Server is running on port ${process.env.PORT}`);
 });
 
